@@ -1,1 +1,245 @@
-<h1>hi world</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculate great things</title>
+  <style>
+    /* --- Page Setup --- */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    /* --- Loader --- */
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+      transition: opacity 0.6s ease, visibility 0.6s;
+    }
+
+    .spinner {
+      border: 6px solid #e0e0e0;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #loader.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* --- Calculator --- */
+    .calculator {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 430px;
+      display: none;
+    }
+    .calculator.show {
+      display: block;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="number"], select {
+      width: 95%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover { background-color: #0056b3; }
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🌀 Loader Section -->
+<div id="loader">
+  <div class="spinner"></div>
+  <p style="margin-top:15px; font-weight:bold; color:#555;">Calculating great things... 💸</p>
+</div>
+
+<!-- 💰 Calculator -->
+<div class="calculator" id="calculator">
+  <h2>💰 Calculating great things</h2>
+
+  <div>
+    <label for="principal">Principal Amount (P):</label>
+    <input type="number" id="principal" min="0" />
+  </div>
+
+  <div>
+    <label for="time">Tenure (N):</label>
+    <input type="number" id="time" min="0" />
+    <select id="timeType">
+      <option value="year">Year(s)</option>
+      <option value="month">Month(s)</option>
+      <option value="week">Week(s)</option>
+      <option value="day">Day(s)</option>
+    </select>
+  </div>
+
+  <!-- Checkboxes for calculation mode -->
+  <div>
+    <label><input type="radio" name="mode" id="modeRate" checked onchange="toggleMode()" /> I have Interest Rate</label>
+    <label><input type="radio" name="mode" id="modeIntAmt" onchange="toggleMode()" /> I have Interest Amount</label>
+    <label><input type="radio" name="mode" id="modeInstAmt" onchange="toggleMode()" /> I have Installment Amount</label>
+  </div>
+
+  <div id="rateDiv">
+    <label for="rate">Interest Rate (%):</label>
+    <input type="number" id="rate" min="0" />
+  </div>
+
+  <div id="intAmtDiv" style="display:none;">
+    <label for="interestAmount">Interest Amount (₹):</label>
+    <input type="number" id="interestAmount" min="0" />
+  </div>
+
+  <div id="instAmtDiv" style="display:none;">
+    <label for="installment">Installment Amount (₹):</label>
+    <input type="number" id="installment" min="0" />
+  </div>
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="result" id="result-output">
+    Interest Amount: 0.00 <br>
+    Rate: 0.00% <br>
+    Installment: 0.00
+  </div>
+</div>
+
+<script>
+  // Simulate loader fade-out
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.getElementById("loader").classList.add("fade-out");
+      document.getElementById("calculator").classList.add("show");
+    }, 1500);
+  });
+
+  function toggleMode() {
+    const isRate = document.getElementById("modeRate").checked;
+    const isIntAmt = document.getElementById("modeIntAmt").checked;
+    const isInstAmt = document.getElementById("modeInstAmt").checked;
+
+    document.getElementById("rateDiv").style.display = isRate ? "block" : "none";
+    document.getElementById("intAmtDiv").style.display = isIntAmt ? "block" : "none";
+    document.getElementById("instAmtDiv").style.display = isInstAmt ? "block" : "none";
+  }
+
+  function calculate() {
+    const P = parseFloat(document.getElementById("principal").value);
+    const N = parseFloat(document.getElementById("time").value);
+    const type = document.getElementById("timeType").value;
+    const isRate = document.getElementById("modeRate").checked;
+    const isIntAmt = document.getElementById("modeIntAmt").checked;
+    const isInstAmt = document.getElementById("modeInstAmt").checked;
+
+    let R = parseFloat(document.getElementById("rate").value);
+    let I = parseFloat(document.getElementById("interestAmount").value);
+    let Installment = parseFloat(document.getElementById("installment").value);
+
+    if (isNaN(P) || isNaN(N) || P <= 0 || N <= 0) {
+      document.getElementById("result-output").innerText = "Please enter valid principal and tenure.";
+      return;
+    }
+
+    let divisor = 100;
+    if (type === "month") divisor = 12 * 100;
+    else if (type === "week") divisor = 52 * 100;
+    else if (type === "day") divisor = 365 * 100;
+    else divisor = 100;
+
+    if (isRate) {
+      if (isNaN(R) || R <= 0) {
+        document.getElementById("result-output").innerText = "Please enter valid interest rate.";
+        return;
+      }
+      I = (P * N * R) / divisor;
+      Installment = (P + I) / N;
+    } 
+    else if (isIntAmt) {
+      if (isNaN(I) || I <= 0) {
+        document.getElementById("result-output").innerText = "Please enter valid interest amount.";
+        return;
+      }
+      R = (I * divisor) / (P * N);
+      Installment = (P + I) / N;
+    } 
+    else if (isInstAmt) {
+      if (isNaN(Installment) || Installment <= 0) {
+        document.getElementById("result-output").innerText = "Please enter valid installment amount.";
+        return;
+      }
+      const total = Installment * N;
+      I = total - P;
+      R = (I * divisor) / (P * N);
+    }
+
+    const total = P + I;
+    document.getElementById("result-output").innerHTML = `
+      Interest Amount: ₹${I.toFixed(2)}<br>
+      Rate: ${R.toFixed(2)}%<br>
+      Total Payable: ₹${total.toFixed(2)}<br>
+      Installment: ₹${Installment.toFixed(2)} per ${type}
+    `;
+  }
+</script>
+
+</body>
+</html>
